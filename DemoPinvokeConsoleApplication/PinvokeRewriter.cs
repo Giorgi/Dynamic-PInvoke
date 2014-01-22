@@ -14,7 +14,7 @@ namespace DemoPinvokeConsoleApplication
             var allAttributes = node.AttributeLists.SelectMany(syntax => syntax.Attributes).Where(syntax => syntax.Name is IdentifierNameSyntax);
 
             var dllImportAttribute = allAttributes.FirstOrDefault(syntax => ((IdentifierNameSyntax)syntax.Name).Identifier.ValueText == "DllImport");
-            
+
             if (dllImportAttribute == null)
             {
                 return base.VisitMethodDeclaration(node);
@@ -48,7 +48,10 @@ namespace DemoPinvokeConsoleApplication
                                               .WithParameterList(node.ParameterList)
                                               .WithDelegateKeyword(delegateKeyword);
 
-            var variableDeclarator = Syntax.VariableDeclarator("library = new UnmanagedLibrary(\"User32.dll\")");
+            var dllNameArgument = dllImportAttribute.ArgumentList.Arguments.Single(syntax => syntax.NameEquals == null);
+            var dllNameSyntax = dllNameArgument.Expression as LiteralExpressionSyntax;
+
+            var variableDeclarator = Syntax.VariableDeclarator(string.Format("library = new UnmanagedLibrary(\"{0}\")", dllNameSyntax.Token.ValueText));
             var declarationSyntax = Syntax.VariableDeclaration(Syntax.ParseTypeName("var"), Syntax.SeparatedList(variableDeclarator));
 
             var functionDeclarationStatement = string.IsNullOrEmpty(entryPointIdentifier)
@@ -91,7 +94,7 @@ namespace DemoPinvokeConsoleApplication
             var identifier = Syntax.Identifier(node.Identifier.ValueText + "Dynamic");
 
             var visitClassDeclaration = (ClassDeclarationSyntax)base.VisitClassDeclaration(node.WithIdentifier(identifier));
-            
+
             visitClassDeclaration = visitClassDeclaration.AddMembers(delegateDeclarations.ToArray())
                                                          .AddMembers(methodDeclarations.ToArray());
 
