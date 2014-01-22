@@ -8,6 +8,7 @@ using Microsoft.Win32.SafeHandles;
 
 namespace DemoPinvokeConsoleApplication
 {
+    //Taken from http://blogs.msdn.com/b/jmstall/archive/2007/01/06/typesafe-getprocaddress.aspx
     public sealed class UnmanagedLibrary : IDisposable
     {
         #region Safe Handles and Native imports
