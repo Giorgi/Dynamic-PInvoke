@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 
 namespace DemoPinvokeConsoleApplication
@@ -7,7 +8,7 @@ namespace DemoPinvokeConsoleApplication
     {
         const string Beep = "MessageBeep";
 
-        [DefaultDllImportSearchPaths(DllImportSearchPath.ApplicationDirectory)]
+        [DebuggerStepThrough]
         [DispId(0), DllImport("User32.dll", EntryPoint = "MessageBeep")]
         public extern static bool r(UInt32 beepType);
 
