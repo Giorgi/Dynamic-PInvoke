@@ -133,14 +133,14 @@ namespace DemoPinvokeConsoleApplication
 
         public override SyntaxNode VisitClassDeclaration(ClassDeclarationSyntax node)
         {
-            var identifier = Syntax.Identifier(node.Identifier.ValueText + "Dynamic");
-
-            var visitClassDeclaration = (ClassDeclarationSyntax)base.VisitClassDeclaration(node.WithIdentifier(identifier));
+            var visitClassDeclaration = (ClassDeclarationSyntax)base.VisitClassDeclaration(node);
 
             visitClassDeclaration = visitClassDeclaration.AddMembers(delegateDeclarations.ToArray())
                                                          .AddMembers(methodDeclarations.ToArray());
 
-            return visitClassDeclaration;
+            var identifier = Syntax.Identifier(node.Identifier.ValueText + "Dynamic");
+
+            return visitClassDeclaration.WithIdentifier(identifier);
         }
     }
 }
