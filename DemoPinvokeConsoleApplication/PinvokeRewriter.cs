@@ -44,9 +44,16 @@ namespace DemoPinvokeConsoleApplication
 
             var delegateKeyword = Syntax.Token(SyntaxKind.DelegateKeyword);
 
+            var unmanagedFunctionPointerAttribute = BuildUnmanagedFunctionPointerAttribute(dllImportAttribute);
+
             var delegateDeclaration = Syntax.DelegateDeclaration(node.ReturnType, node.Identifier.ValueText + "Delegate")
                                               .WithParameterList(node.ParameterList)
                                               .WithDelegateKeyword(delegateKeyword);
+
+            if (unmanagedFunctionPointerAttribute != null)
+            {
+                delegateDeclaration = delegateDeclaration.WithAttributeLists(unmanagedFunctionPointerAttribute);
+            }
 
             var dllNameArgument = dllImportAttribute.ArgumentList.Arguments.Single(syntax => syntax.NameEquals == null);
             var dllNameSyntax = dllNameArgument.Expression as LiteralExpressionSyntax;
@@ -87,6 +94,41 @@ namespace DemoPinvokeConsoleApplication
             methodDeclarations.Add(methodDeclaration);
 
             return default(SyntaxNode);
+        }
+
+        private AttributeListSyntax BuildUnmanagedFunctionPointerAttribute(AttributeSyntax dllImportAttribute)
+        {
+            var dllImportArguments = dllImportAttribute.ArgumentList.Arguments
+                                            .Where(syntax => syntax.NameEquals != null)
+                                            .Where(syntax =>
+                                            {
+                                                var argumentName = syntax.NameEquals.Name.Identifier.ValueText;
+                                                return argumentName != "EntryPoint"
+                                                    && argumentName != "ExactSpelling" && argumentName != "PreserveSig";
+                                            }).ToArray();
+
+            if (dllImportArguments.Length == 0)
+            {
+                return null;
+            }
+
+            var callingConventionAttribute = dllImportAttribute.ArgumentList.Arguments.FirstOrDefault(syntax => syntax.NameEquals != null && syntax.NameEquals.Name.Identifier.ValueText == "CallingConvention");
+
+            var callingConvention = "Winapi";
+            if (callingConventionAttribute != null)
+            {
+                var expressionSyntax = callingConventionAttribute.Expression as MemberAccessExpressionSyntax;
+                callingConvention = expressionSyntax.Name.Identifier.ValueText;
+
+                dllImportArguments = dllImportArguments.Where(syntax => syntax.NameEquals.Name.Identifier.ValueText != "CallingConvention").ToArray();
+            }
+
+            var arguments = Syntax.SeparatedList(Syntax.AttributeArgument(Syntax.ParseExpression(string.Format("CallingConvention.{0}", callingConvention))))
+                                    .Add(dllImportArguments);
+
+            var unmanagedFunctionPointerAttribute = Syntax.Attribute(Syntax.ParseName("UnmanagedFunctionPointer")).WithArgumentList(Syntax.AttributeArgumentList(arguments));
+
+            return Syntax.AttributeList(Syntax.SeparatedList(unmanagedFunctionPointerAttribute));
         }
 
         public override SyntaxNode VisitClassDeclaration(ClassDeclarationSyntax node)
