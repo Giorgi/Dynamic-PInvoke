@@ -17,6 +17,8 @@ namespace DemoPinvokeConsoleApplication
 
         public override SyntaxNode VisitMethodDeclaration(MethodDeclarationSyntax node)
         {
+            var methodSymbol = semanticModel.GetDeclaredSymbol(node);
+            
             var allAttributes = node.AttributeLists.SelectMany(syntax => syntax.Attributes).Where(syntax => syntax.Name is IdentifierNameSyntax);
 
             var dllImportAttribute = allAttributes.FirstOrDefault(syntax => ((IdentifierNameSyntax)syntax.Name).Identifier.ValueText == "DllImport");
@@ -78,10 +80,7 @@ namespace DemoPinvokeConsoleApplication
 
             var invocationExpressionSyntax = Syntax.InvocationExpression(Syntax.ParseExpression("function"), Syntax.ArgumentList(Syntax.SeparatedList(args, argSeparators)));
 
-            var isVoid = (node.ReturnType is PredefinedTypeSyntax) &&
-                         ((PredefinedTypeSyntax)(node.ReturnType)).Keyword.Kind == SyntaxKind.VoidKeyword;
-
-            var lastStatement = isVoid
+            var lastStatement = methodSymbol.ReturnsVoid
                 ? (StatementSyntax)Syntax.ExpressionStatement(invocationExpressionSyntax)
                 : Syntax.ReturnStatement(invocationExpressionSyntax);
 

@@ -25,5 +25,8 @@ namespace DemoPinvokeConsoleApplication
         {
             
         }
+
+        [DllImport("shell32.dll")]
+        static extern void DragAcceptFiles(IntPtr hwnd, bool fAccept);
     }
 }
