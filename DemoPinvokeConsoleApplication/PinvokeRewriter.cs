@@ -6,8 +6,14 @@ namespace DemoPinvokeConsoleApplication
 {
     class PinvokeRewriter : SyntaxRewriter
     {
+        private readonly SemanticModel semanticModel;
         List<DelegateDeclarationSyntax> delegateDeclarations = new List<DelegateDeclarationSyntax>();
         List<MethodDeclarationSyntax> methodDeclarations = new List<MethodDeclarationSyntax>();
+
+        public PinvokeRewriter(SemanticModel semanticModel)
+        {
+            this.semanticModel = semanticModel;
+        }
 
         public override SyntaxNode VisitMethodDeclaration(MethodDeclarationSyntax node)
         {

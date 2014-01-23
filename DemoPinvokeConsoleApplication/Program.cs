@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+﻿using System.IO;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
+using Roslyn.Compilers;
 using Roslyn.Compilers.CSharp;
 
 namespace DemoPinvokeConsoleApplication
@@ -22,7 +18,13 @@ namespace DemoPinvokeConsoleApplication
             var syntaxTree = SyntaxTree.ParseFile(Path.GetFullPath(input));
             var root = syntaxTree.GetRoot();
 
-            var pinvokeRewriter = new PinvokeRewriter();
+            var compilation = Compilation.Create("PinvokeRewriter")
+                                         .AddSyntaxTrees(syntaxTree)
+                                         .AddReferences(new MetadataFileReference(typeof(object).Assembly.Location));
+
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            
+            var pinvokeRewriter = new PinvokeRewriter(semanticModel);
             var rewritten = pinvokeRewriter.Visit(root).NormalizeWhitespace();
 
             using (var writer = new StreamWriter(Path.GetFullPath(Path.Combine(directory, @"..\..\PInvokeRewritten.cs"))))
