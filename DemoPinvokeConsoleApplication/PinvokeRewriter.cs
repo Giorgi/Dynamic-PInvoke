@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+
+using Roslyn.Compilers;
 using Roslyn.Compilers.CSharp;
 
 namespace DemoPinvokeConsoleApplication
@@ -18,7 +20,8 @@ namespace DemoPinvokeConsoleApplication
         public override SyntaxNode VisitMethodDeclaration(MethodDeclarationSyntax node)
         {
             var methodSymbol = semanticModel.GetDeclaredSymbol(node);
-            
+            var dllImportData = methodSymbol.GetDllImportData();
+
             var allAttributes = node.AttributeLists.SelectMany(syntax => syntax.Attributes).Where(syntax => syntax.Name is IdentifierNameSyntax);
 
             var dllImportAttribute = allAttributes.FirstOrDefault(syntax => ((IdentifierNameSyntax)syntax.Name).Identifier.ValueText == "DllImport");
@@ -49,7 +52,7 @@ namespace DemoPinvokeConsoleApplication
                     entryPointIdentifier = identifierNameSyntax.Identifier.ValueText;
                 }
             }
-
+            
             var delegateKeyword = Syntax.Token(SyntaxKind.DelegateKeyword);
 
             var unmanagedFunctionPointerAttribute = BuildUnmanagedFunctionPointerAttribute(dllImportAttribute);
@@ -62,11 +65,8 @@ namespace DemoPinvokeConsoleApplication
             {
                 delegateDeclaration = delegateDeclaration.WithAttributeLists(unmanagedFunctionPointerAttribute);
             }
-
-            var dllNameArgument = dllImportAttribute.ArgumentList.Arguments.Single(syntax => syntax.NameEquals == null);
-            var dllNameSyntax = dllNameArgument.Expression as LiteralExpressionSyntax;
-
-            var variableDeclarator = Syntax.VariableDeclarator(string.Format("library = new UnmanagedLibrary(\"{0}\")", dllNameSyntax.Token.ValueText));
+            
+            var variableDeclarator = Syntax.VariableDeclarator(string.Format("library = new UnmanagedLibrary(\"{0}\")", dllImportData.ModuleName));
             var declarationSyntax = Syntax.VariableDeclaration(Syntax.ParseTypeName("var"), Syntax.SeparatedList(variableDeclarator));
 
             var functionDeclarationStatement = string.IsNullOrEmpty(entryPointIdentifier)
