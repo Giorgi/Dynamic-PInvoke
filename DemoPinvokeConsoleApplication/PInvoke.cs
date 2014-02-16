@@ -18,7 +18,7 @@ namespace DemoPinvokeConsoleApplication
         [DllImport("User32.dll", CallingConvention = CallingConvention.StdCall)]
         public static extern bool MessageBeep(UInt32 beepType);
 
-        [DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
+        [System.Runtime.InteropServices.DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
         static extern bool CopyFile(string lpExistingFileName, string lpNewFileName, bool bFailIfExists);
 
         public void d()
