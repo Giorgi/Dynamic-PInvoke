@@ -35,7 +35,7 @@ namespace DemoPinvokeConsoleApplication
                                               .WithDelegateKeyword(delegateKeyword)
                                               .WithParameterList(node.ParameterList)
                                               .WithAttributeLists(unmanagedFunctionPointerAttribute);
-            
+
             var variableDeclarator = Syntax.VariableDeclarator(string.Format("library = new UnmanagedLibrary(\"{0}\")", dllImportData.ModuleName));
             var declarationSyntax = Syntax.VariableDeclaration(Syntax.ParseTypeName("var"), Syntax.SeparatedList(variableDeclarator));
 
@@ -75,7 +75,7 @@ namespace DemoPinvokeConsoleApplication
             var charset = string.Format("CharSet = CharSet.{0}", dllImportData.CharacterSet);
             var charsetArgument = Syntax.AttributeArgument(Syntax.ParseExpression(charset));
 
-            var setLastError = string.Format("SetLastError = {0}", dllImportData.SetLastError.ToString().ToLower());
+            var setLastError = string.Format("SetLastError = {0}", dllImportData.SetLastError.ToProperString());
             var setLastErrorArgument = Syntax.AttributeArgument(Syntax.ParseExpression(setLastError));
 
             var callingConvention = string.Format("CallingConvention.{0}", dllImportData.CallingConvention);
@@ -85,18 +85,18 @@ namespace DemoPinvokeConsoleApplication
 
             if (dllImportData.BestFitMapping.HasValue)
             {
-                var bestFitMapping = string.Format("BestFitMapping = {0}", dllImportData.BestFitMapping);
+                var bestFitMapping = string.Format("BestFitMapping = {0}", dllImportData.BestFitMapping.ToProperString());
                 var bestFitMappingArgument = Syntax.AttributeArgument(Syntax.ParseExpression(bestFitMapping));
 
-                arguments.Add(bestFitMappingArgument);
+                arguments = arguments.Add(bestFitMappingArgument);
             }
 
             if (dllImportData.ThrowOnUnmappableCharacter.HasValue)
             {
-                var throwOnUnmappableCharacter = string.Format("BestFitMapping = {0}", dllImportData.ThrowOnUnmappableCharacter);
+                var throwOnUnmappableCharacter = string.Format("ThrowOnUnmappableChar = {0}", dllImportData.ThrowOnUnmappableCharacter.ToProperString());
                 var throwOnUnmappableCharacterArgument = Syntax.AttributeArgument(Syntax.ParseExpression(throwOnUnmappableCharacter));
 
-                arguments.Add(throwOnUnmappableCharacterArgument);
+                arguments = arguments.Add(throwOnUnmappableCharacterArgument);
             }
 
             var unmanagedFunctionPointerAttribute = Syntax.Attribute(Syntax.ParseName("UnmanagedFunctionPointer"))
@@ -115,6 +115,24 @@ namespace DemoPinvokeConsoleApplication
             var identifier = Syntax.Identifier(node.Identifier.ValueText + "Dynamic");
 
             return visitClassDeclaration.WithIdentifier(identifier);
+        }
+    }
+
+    static class BooleanExtensions
+    {
+        public static string ToProperString(this bool @value)
+        {
+            return @value.ToString().ToLower();
+        }
+
+        public static string ToProperString(this bool? @value)
+        {
+            if (@value.HasValue)
+            {
+                return @value.ToString().ToLower();
+            }
+
+            return "";
         }
     }
 }
