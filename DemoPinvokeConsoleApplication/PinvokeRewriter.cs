@@ -32,14 +32,10 @@ namespace DemoPinvokeConsoleApplication
             var unmanagedFunctionPointerAttribute = BuildUnmanagedFunctionPointerAttribute(dllImportData);
 
             var delegateDeclaration = Syntax.DelegateDeclaration(node.ReturnType, node.Identifier.ValueText + "Delegate")
+                                              .WithDelegateKeyword(delegateKeyword)
                                               .WithParameterList(node.ParameterList)
-                                              .WithDelegateKeyword(delegateKeyword);
-
-            if (unmanagedFunctionPointerAttribute != null)
-            {
-                delegateDeclaration = delegateDeclaration.WithAttributeLists(unmanagedFunctionPointerAttribute);
-            }
-
+                                              .WithAttributeLists(unmanagedFunctionPointerAttribute);
+            
             var variableDeclarator = Syntax.VariableDeclarator(string.Format("library = new UnmanagedLibrary(\"{0}\")", dllImportData.ModuleName));
             var declarationSyntax = Syntax.VariableDeclaration(Syntax.ParseTypeName("var"), Syntax.SeparatedList(variableDeclarator));
 
