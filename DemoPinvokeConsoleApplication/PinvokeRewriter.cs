@@ -31,10 +31,13 @@ namespace DemoPinvokeConsoleApplication
 
             var unmanagedFunctionPointerAttribute = BuildUnmanagedFunctionPointerAttribute(dllImportData);
 
+            var returnKeywordAttributes = node.AttributeLists.Where(syntax => syntax.Target != null && syntax.Target.Identifier.Kind == SyntaxKind.ReturnKeyword);
+
             var delegateDeclaration = Syntax.DelegateDeclaration(node.ReturnType, node.Identifier.ValueText + "Delegate")
                                               .WithDelegateKeyword(delegateKeyword)
                                               .WithParameterList(node.ParameterList)
-                                              .WithAttributeLists(unmanagedFunctionPointerAttribute);
+                                              .WithAttributeLists(unmanagedFunctionPointerAttribute)
+                                              .AddAttributeLists(returnKeywordAttributes.ToArray());
 
             var variableDeclarator = Syntax.VariableDeclarator(string.Format("library = new UnmanagedLibrary(\"{0}\")", dllImportData.ModuleName));
             var declarationSyntax = Syntax.VariableDeclaration(Syntax.ParseTypeName("var"), Syntax.SeparatedList(variableDeclarator));

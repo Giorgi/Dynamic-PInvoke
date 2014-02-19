@@ -21,6 +21,10 @@ namespace DemoPinvokeConsoleApplication
         [System.Runtime.InteropServices.DllImport("kernel32.dll", CharSet = CharSet.Unicode, ThrowOnUnmappableChar = true, BestFitMapping = true)]
         static extern bool CopyFile(string lpExistingFileName, string lpNewFileName, bool bFailIfExists);
 
+        [DllImport("user32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        static extern bool DestroyWindow(IntPtr hwnd);
+
         public void d()
         {
             

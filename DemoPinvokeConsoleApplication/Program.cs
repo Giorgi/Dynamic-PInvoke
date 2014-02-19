@@ -10,8 +10,6 @@ namespace DemoPinvokeConsoleApplication
     {
         static void Main(string[] args)
         {
-            PInvoke.r(0);
-
             var directory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             var input = Path.Combine(directory, @"..\..\PInvoke.cs");
 
