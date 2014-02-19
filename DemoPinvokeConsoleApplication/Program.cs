@@ -3,6 +3,8 @@ using System.Reflection;
 
 using Roslyn.Compilers;
 using Roslyn.Compilers.CSharp;
+using Roslyn.Services;
+using Roslyn.Services.Formatting;
 
 namespace DemoPinvokeConsoleApplication
 {
@@ -23,7 +25,7 @@ namespace DemoPinvokeConsoleApplication
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             
             var pinvokeRewriter = new PinvokeRewriter(semanticModel);
-            var rewritten = pinvokeRewriter.Visit(root).NormalizeWhitespace();
+            var rewritten = pinvokeRewriter.Visit(root).Format(FormattingOptions.GetDefaultOptions()).GetFormattedRoot();
 
             using (var writer = new StreamWriter(Path.GetFullPath(Path.Combine(directory, @"..\..\PInvokeRewritten.cs"))))
             {
