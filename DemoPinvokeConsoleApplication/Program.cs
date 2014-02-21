@@ -30,7 +30,7 @@ namespace DemoPinvokeConsoleApplication
 
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
 
-            var pinvokeRewriter = new PinvokeRewriter(semanticModel);
+            var pinvokeRewriter = new PinvokeSyntaxRewriter(semanticModel);
             var rewritten = pinvokeRewriter.Visit(root).Format(FormattingOptions.GetDefaultOptions()).GetFormattedRoot();
 
             using (var writer = new StreamWriter(outputFile))

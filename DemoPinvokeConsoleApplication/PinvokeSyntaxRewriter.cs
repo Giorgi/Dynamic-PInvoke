@@ -6,13 +6,13 @@ using Roslyn.Compilers.CSharp;
 
 namespace DemoPinvokeConsoleApplication
 {
-    class PinvokeRewriter : SyntaxRewriter
+    class PinvokeSyntaxRewriter : SyntaxRewriter
     {
         private readonly SemanticModel semanticModel;
         List<DelegateDeclarationSyntax> delegateDeclarations = new List<DelegateDeclarationSyntax>();
         List<MethodDeclarationSyntax> methodDeclarations = new List<MethodDeclarationSyntax>();
 
-        public PinvokeRewriter(SemanticModel semanticModel)
+        public PinvokeSyntaxRewriter(SemanticModel semanticModel)
         {
             this.semanticModel = semanticModel;
         }
