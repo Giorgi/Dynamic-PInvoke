@@ -2,7 +2,7 @@
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 
-namespace DemoPinvokeConsoleApplication
+namespace PinvokeRewriterDemoApplication
 {
     class PInvoke
     {

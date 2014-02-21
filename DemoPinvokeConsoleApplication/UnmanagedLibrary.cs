@@ -6,7 +6,7 @@ using System.Security.Permissions;
 
 using Microsoft.Win32.SafeHandles;
 
-namespace DemoPinvokeConsoleApplication
+namespace PinvokeRewriterDemoApplication
 {
     //Taken from http://blogs.msdn.com/b/jmstall/archive/2007/01/06/typesafe-getprocaddress.aspx
     public sealed class UnmanagedLibrary : IDisposable

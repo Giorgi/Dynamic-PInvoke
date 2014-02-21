@@ -1,12 +1,9 @@
 ﻿using System.IO;
 using System.Reflection;
 
-using Roslyn.Compilers;
-using Roslyn.Compilers.CSharp;
-using Roslyn.Services;
-using Roslyn.Services.Formatting;
+using Giorgi.Roslyn.PinvokeRewriter;
 
-namespace DemoPinvokeConsoleApplication
+namespace PinvokeRewriterDemoApplication
 {
     class Program
     {
@@ -16,27 +13,7 @@ namespace DemoPinvokeConsoleApplication
             var inputFile = Path.Combine(directory, @"..\..\PInvoke.cs");
             var outputFile = Path.GetFullPath(Path.Combine(directory, @"..\..\PInvokeRewritten.cs"));
             
-            RewritePinvoke(inputFile, outputFile);
-        }
-
-        private static void RewritePinvoke(string inputFile, string outputFile)
-        {
-            var syntaxTree = SyntaxTree.ParseFile(Path.GetFullPath(inputFile));
-            var root = syntaxTree.GetRoot();
-
-            var compilation = Compilation.Create("PinvokeRewriter")
-                .AddSyntaxTrees(syntaxTree)
-                .AddReferences(new MetadataFileReference(typeof (object).Assembly.Location));
-
-            var semanticModel = compilation.GetSemanticModel(syntaxTree);
-
-            var pinvokeRewriter = new PinvokeSyntaxRewriter(semanticModel);
-            var rewritten = pinvokeRewriter.Visit(root).Format(FormattingOptions.GetDefaultOptions()).GetFormattedRoot();
-
-            using (var writer = new StreamWriter(outputFile))
-            {
-                rewritten.WriteTo(writer);
-            }
+            new Rewriter().RewritePinvoke(inputFile, outputFile);
         }
     }
 }

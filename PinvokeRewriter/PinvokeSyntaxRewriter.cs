@@ -4,7 +4,7 @@ using System.Linq;
 using Roslyn.Compilers;
 using Roslyn.Compilers.CSharp;
 
-namespace DemoPinvokeConsoleApplication
+namespace Giorgi.Roslyn.PinvokeRewriter
 {
     class PinvokeSyntaxRewriter : SyntaxRewriter
     {
