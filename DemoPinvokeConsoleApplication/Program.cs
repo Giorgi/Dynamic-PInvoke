@@ -13,21 +13,27 @@ namespace DemoPinvokeConsoleApplication
         static void Main(string[] args)
         {
             var directory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            var input = Path.Combine(directory, @"..\..\PInvoke.cs");
+            var inputFile = Path.Combine(directory, @"..\..\PInvoke.cs");
+            var outputFile = Path.GetFullPath(Path.Combine(directory, @"..\..\PInvokeRewritten.cs"));
+            
+            RewritePinvoke(inputFile, outputFile);
+        }
 
-            var syntaxTree = SyntaxTree.ParseFile(Path.GetFullPath(input));
+        private static void RewritePinvoke(string inputFile, string outputFile)
+        {
+            var syntaxTree = SyntaxTree.ParseFile(Path.GetFullPath(inputFile));
             var root = syntaxTree.GetRoot();
 
             var compilation = Compilation.Create("PinvokeRewriter")
-                                         .AddSyntaxTrees(syntaxTree)
-                                         .AddReferences(new MetadataFileReference(typeof(object).Assembly.Location));
+                .AddSyntaxTrees(syntaxTree)
+                .AddReferences(new MetadataFileReference(typeof (object).Assembly.Location));
 
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
-            
+
             var pinvokeRewriter = new PinvokeRewriter(semanticModel);
             var rewritten = pinvokeRewriter.Visit(root).Format(FormattingOptions.GetDefaultOptions()).GetFormattedRoot();
 
-            using (var writer = new StreamWriter(Path.GetFullPath(Path.Combine(directory, @"..\..\PInvokeRewritten.cs"))))
+            using (var writer = new StreamWriter(outputFile))
             {
                 rewritten.WriteTo(writer);
             }
